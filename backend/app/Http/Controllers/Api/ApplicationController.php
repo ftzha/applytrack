@@ -5,18 +5,15 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 
-use App\Models\User;
-
 class ApplicationController extends Controller
 {
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        $user = User::where('email', 'demo@applytrack.test')->firstOrFail();
-
-        $applications = $user->applications()
+        $applications = $request->user()
+            ->applications()
             ->latest()
             ->get();
 
