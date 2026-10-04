@@ -22,5 +22,9 @@ Route::middleware('auth:sanctum')->group(function () {
 
     Route::post('/logout', [AuthController::class, 'logout']);
 
-    Route::get('/applications', [ApplicationController::class, 'index']);
+    Route::get('/applications', [ApplicationController::class, 'index']); //List all existing applications
+    Route::post('/applications', [ApplicationController::class, 'store']); //Create new application
+    Route::get('/applications/{application}', [ApplicationController::class, 'show']); //View specific application
+    Route::patch('/applications/{application}', [ApplicationController::class, 'update']); //Update specific application
+    Route::delete('/applications/{application}', [ApplicationController::class, 'destroy']); //Delete specific application
 });
