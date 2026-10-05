@@ -5,32 +5,17 @@ import { useDashboardStore } from '@/stores/dashboard'
 import AppNav from '@/components/AppNav.vue'
 import ApplicationStatusBadge from '@/components/ApplicationStatusBadge.vue'
 
+import {
+  formatDate,
+  formatDateTime,
+} from '@/utils/formatters'
+
 const dashboardStore = useDashboardStore()
 
 // Fetch the authenticated user's statistics when Dashboard opens
 onMounted(() => {
   dashboardStore.fetchDashboard()
 })
-
-function formatDate(date: string | null) {
-  if (!date) return 'Not applied yet'
-
-  return new Intl.DateTimeFormat('en-MY', {
-    day: '2-digit',
-    month: 'short',
-    year: 'numeric',
-  }).format(new Date(date))
-}
-
-function formatDateTime(date: string) {
-  return new Intl.DateTimeFormat('en-MY', {
-    day: '2-digit',
-    month: 'short',
-    year: 'numeric',
-    hour: '2-digit',
-    minute: '2-digit',
-  }).format(new Date(date))
-}
 </script>
 
 <template>

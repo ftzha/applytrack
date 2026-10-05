@@ -10,6 +10,11 @@ import type {
   StatusOption,
 } from '@/types/application'
 
+import {
+  formatDate,
+  formatSalaryRange,
+} from '@/utils/formatters'
+
 const applicationStore = useApplicationStore()
 
 const search = ref('')
@@ -84,51 +89,6 @@ function goToPage(page: number) {
     sort.value,
     page,
   )
-}
-
-// Display salary as Malaysian-style currency formatting
-function formatSalary(
-  amount: string | null,
-  currency: string | null,
-) {
-  if (!amount) return null
-
-  return new Intl.NumberFormat('en-MY', {
-    style: 'currency',
-    currency: currency ?? 'MYR',
-    maximumFractionDigits: 0,
-  }).format(Number(amount))
-}
-
-function formatSalaryRange(
-  min: string | null,
-  max: string | null,
-  currency: string | null,
-) {
-  if (min && max) {
-    return `${formatSalary(min, currency)} ~ ${formatSalary(max, currency)}`
-  }
-
-  if (min) {
-    return `From ${formatSalary(min, currency)}`
-  }
-
-  if (max) {
-    return `Up to ${formatSalary(max, currency)}`
-  }
-
-  return 'Not specified'
-}
-
-// Convert API dates into a friendlier display format
-function formatDate(date: string | null) {
-  if (!date) return 'No Information'
-
-  return new Intl.DateTimeFormat('en-MY', {
-    day: '2-digit',
-    month: 'short',
-    year: 'numeric',
-  }).format(new Date(date))
 }
 </script>
 
