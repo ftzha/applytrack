@@ -72,6 +72,12 @@ class ApplicationController extends Controller
             ->applications()
             ->create($request->validated());
 
+        // Record the application's initial status
+        $application->statusHistories()->create([
+            'from_status' => null,
+            'to_status' => $application->status,
+        ]);
+
         return response()->json([
             'data' => $application,
         ], 201);
@@ -83,6 +89,13 @@ class ApplicationController extends Controller
     public function show(Application $application)
     {
         $this->authorize('view', $application);
+
+        // Load newest status changes first for the application timeline
+        $application->load([
+            'statusHistories' => function ($query) {
+                $query->latest();
+            },
+        ]);
 
         return response()->json([
             'data' => $application,
@@ -98,7 +111,18 @@ class ApplicationController extends Controller
     ) {
         $this->authorize('update', $application);
 
+        // Remember the status before updating the application.
+        $oldStatus = $application->status;
+
         $application->update($request->validated());
+
+        // Only create history when the status actually changed.
+        if ($application->wasChanged('status')) {
+            $application->statusHistories()->create([
+                'from_status' => $oldStatus,
+                'to_status' => $application->status,
+            ]);
+        }
 
         return response()->json([
             'data' => $application,

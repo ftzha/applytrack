@@ -15,6 +15,8 @@ export interface Application {
   notes: string | null
   created_at: string
   updated_at: string
+
+  status_histories?: ApplicationStatusHistory[]
 }
 
 export interface ApplicationFormData {
@@ -45,4 +47,13 @@ export interface ApplicationPagination {
   total: number
   from: number | null
   to: number | null
+}
+
+export interface ApplicationStatusHistory {
+  id: number
+  application_id: number
+  from_status: string | null
+  to_status: string
+  created_at: string
+  updated_at: string
 }
