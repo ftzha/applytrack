@@ -19,13 +19,20 @@ export const useApplicationStore = defineStore('applications', () => {
   const error = ref<string | null>(null)
 
   // Returns all applications for the user
-  async function fetchApplications() {
+  async function fetchApplications(
+    search = '',
+    status = '',
+  ) {
     loading.value = true
-    error.value = null
+    error.value = ''
 
     try {
-      // Axios automatically attaches our Bearer token via the interceptor
-      const response = await api.get('/applications')
+      const response = await api.get('/applications', {
+        params: {
+          search: search || undefined,
+          status: status || undefined,
+        },
+      })
 
       applications.value = response.data.data
     } catch {

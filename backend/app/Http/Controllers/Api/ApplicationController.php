@@ -16,8 +16,26 @@ class ApplicationController extends Controller
      */
     public function index(Request $request)
     {
-        $applications = $request->user()
-            ->applications()
+        // Start with applications belonging only to the authenticated user.
+        $query = Application::query()
+            ->where('user_id', $request->user()->id);
+
+        // Search by company name OR position.
+        if ($request->filled('search')) {
+            $search = $request->input('search');
+
+            $query->where(function ($q) use ($search) {
+                $q->where('company_name', 'like', "%{$search}%")
+                    ->orWhere('position', 'like', "%{$search}%");
+            });
+        }
+
+        // Filter by application status.
+        if ($request->filled('status')) {
+            $query->where('status', $request->input('status'));
+        }
+
+        $applications = $query
             ->latest()
             ->get();
 

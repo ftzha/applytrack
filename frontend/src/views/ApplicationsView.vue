@@ -1,13 +1,36 @@
 <script setup lang="ts">
-import { onMounted, ref } from 'vue'
+import { onMounted, ref, watch } from 'vue'
 import { useApplicationStore } from '@/stores/applications'
 
+import api from '@/services/api'
 import AppNav from '@/components/AppNav.vue'
 import ApplicationStatusBadge from '@/components/ApplicationStatusBadge.vue'
 
+import type {
+  StatusOption,
+} from '@/types/application'
+
 const applicationStore = useApplicationStore()
 
+const search = ref('')
+const statusFilter = ref('')
+
 const deletingId = ref<number | null>(null)
+
+// Status options provided by Laravel's ApplicationStatus enum
+const statusOptions = ref<StatusOption[]>([])
+
+async function fetchStatuses() {
+  const response = await api.get('/application-statuses')
+
+  statusOptions.value = response.data
+}
+
+// Fetch applications and statuses when this page is first loaded
+onMounted(() => {
+  applicationStore.fetchApplications()
+  fetchStatuses()
+})
 
 async function handleDelete(id: number) {
   const confirmed = window.confirm(
@@ -29,10 +52,19 @@ async function handleDelete(id: number) {
   }
 }
 
-// Fetch applications when this page is first loaded
-onMounted(() => {
-  applicationStore.fetchApplications()
+watch(statusFilter, () => {
+  applicationStore.fetchApplications(
+    search.value,
+    statusFilter.value,
+  )
 })
+
+function handleSearch() {
+  applicationStore.fetchApplications(
+    search.value,
+    statusFilter.value,
+  )
+}
 
 // Display salary as Malaysian-style currency formatting
 function formatSalary(
@@ -100,6 +132,42 @@ function formatDate(date: string | null) {
       + Add Application
     </RouterLink>
   </header>
+
+  <div class="application-filters">
+    <form
+      class="search-form"
+      @submit.prevent="handleSearch"
+    >
+      <input
+        v-model="search"
+        type="search"
+        placeholder="Search company or position..."
+        class="filter-input"
+      />
+
+      <button
+        type="submit"
+        class="btn btn-primary"
+      >
+        Search
+      </button>
+    </form>
+
+    <select
+      v-model="statusFilter"
+      class="filter-select"
+    >
+      <option value="">All statuses</option>
+
+      <option
+        v-for="status in statusOptions"
+        :key="status.value"
+        :value="status.value"
+      >
+        {{ status.label }}
+      </option>
+    </select>
+  </div>
 
     <p v-if="applicationStore.loading">
       Loading applications...
@@ -170,6 +238,47 @@ function formatDate(date: string | null) {
 </template>
 
 <style scoped>
+.application-filters {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 24px;
+}
+
+.search-form {
+  display: flex;
+  flex: 1;
+  gap: 8px;
+}
+
+.filter-input,
+.filter-select {
+  min-height: 42px;
+  padding: 0 12px;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  background: #ffffff;
+}
+
+.filter-input {
+  flex: 1;
+}
+
+.filter-select {
+  min-width: 180px;
+}
+
+@media (max-width: 640px) {
+  .application-filters {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .filter-select {
+    width: 100%;
+  }
+}
+
 .application-list {
   display: grid;
   gap: 16px;
