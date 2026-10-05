@@ -48,7 +48,10 @@ const router = createRouter({
     {
       path: '/applications/:id',
       name: 'application-show',
-      component: () => import('@/views/ApplicationShowView.vue'),
+      component: ApplicationShowView,
+      meta: {
+        requiresAuth: true,
+      },
     },
     {
       path: '/applications/:id/edit',

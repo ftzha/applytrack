@@ -21,6 +21,16 @@ function formatDate(date: string | null) {
     year: 'numeric',
   }).format(new Date(date))
 }
+
+function formatDateTime(date: string) {
+  return new Intl.DateTimeFormat('en-MY', {
+    day: '2-digit',
+    month: 'short',
+    year: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit',
+  }).format(new Date(date))
+}
 </script>
 
 <template>
@@ -134,7 +144,7 @@ function formatDate(date: string | null) {
           <RouterLink
             v-for="application in dashboardStore.stats.recent_applications"
             :key="application.id"
-            :to="`/applications/${application.id}/edit`"
+            :to="`/applications/${application.id}`"
             class="card recent-application"
           >
             <div class="recent-info">
@@ -152,6 +162,58 @@ function formatDate(date: string | null) {
             </div>
 
             <ApplicationStatusBadge :status="application.status" />
+          </RouterLink>
+        </div>
+      </section>
+
+      <section class="recent-section">
+        <div class="section-header">
+          <h2>Recent Activity</h2>
+        </div>
+
+        <div
+          v-if="dashboardStore.stats.recent_activity.length === 0"
+          class="card"
+        >
+          No recent activity yet.
+        </div>
+
+        <div
+          v-else
+          class="recent-list"
+        >
+          <RouterLink
+            v-for="activity in dashboardStore.stats.recent_activity"
+            :key="activity.id"
+            :to="`/applications/${activity.application.id}`"
+            class="card activity-item"
+          >
+            <div class="activity-content">
+              <strong>
+                {{ activity.application.position }}
+              </strong>
+
+              <span class="activity-company">
+                {{ activity.application.company_name }}
+              </span>
+
+              <div class="activity-transition">
+                <ApplicationStatusBadge
+                  v-if="activity.from_status"
+                  :status="activity.from_status"
+                />
+
+                <span v-if="activity.from_status">
+                  →
+                </span>
+
+                <ApplicationStatusBadge :status="activity.to_status" />
+              </div>
+            </div>
+
+            <span class="activity-date">
+              {{ formatDateTime(activity.created_at) }}
+            </span>
           </RouterLink>
         </div>
       </section>
@@ -222,6 +284,7 @@ function formatDate(date: string | null) {
   gap: 12px;
 }
 
+/* Recent Applications */
 .recent-application {
   display: flex;
   align-items: center;
@@ -245,5 +308,50 @@ function formatDate(date: string | null) {
   margin-top: 6px;
   font-size: 13px;
   color: #6b7280;
+}
+
+/* Recent Activity */
+.activity-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  text-decoration: none;
+  color: inherit;
+}
+
+.activity-content {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 0;
+}
+
+.activity-company {
+  font-size: 14px;
+  color: #6b7280;
+}
+
+.activity-transition {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 4px;
+}
+
+.activity-date {
+  flex-shrink: 0;
+  font-size: 13px;
+  color: #6b7280;
+}
+
+/* Mobile */
+@media (max-width: 640px) {
+  .recent-application,
+  .activity-item {
+    flex-direction: column;
+    align-items: flex-start;
+  }
 }
 </style>

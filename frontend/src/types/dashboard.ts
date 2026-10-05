@@ -7,6 +7,20 @@ export interface RecentApplication {
   created_at: string
 }
 
+interface RecentActivity {
+  id: number
+  application_id: number
+  from_status: string | null
+  to_status: string
+  created_at: string
+
+  application: {
+    id: number
+    company_name: string
+    position: string
+  }
+}
+
 export interface DashboardStats {
   total: number
   interested: number
@@ -17,4 +31,5 @@ export interface DashboardStats {
   rejected: number
   withdrawn: number
   recent_applications: RecentApplication[]
+  recent_activity: RecentActivity[]
 }

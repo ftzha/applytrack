@@ -6,6 +6,8 @@ use App\Http\Controllers\Controller;
 use App\Models\Application;
 use Illuminate\Http\Request;
 
+use App\Models\ApplicationStatusHistory;
+
 class DashboardController extends Controller
 {
     public function index(Request $request)
@@ -30,6 +32,17 @@ class DashboardController extends Controller
                 'created_at',
             ]);
 
+        $recentActivity = ApplicationStatusHistory::query()
+            ->whereHas('application', function ($query) use ($request) {
+                $query->where('user_id', $request->user()->id);
+            })
+            ->with([
+                'application:id,company_name,position',
+            ])
+            ->latest()
+            ->limit(5)
+            ->get();
+
         return response()->json([
             'data' => [
                 'total' => $statusCounts->sum(),
@@ -42,6 +55,7 @@ class DashboardController extends Controller
                 'withdrawn' => (int) ($statusCounts['withdrawn'] ?? 0),
 
                 'recent_applications' => $recentApplications,
+                'recent_activity' => $recentActivity,
             ],
         ]);
     }
