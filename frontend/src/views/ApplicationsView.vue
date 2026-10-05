@@ -86,42 +86,39 @@ async function confirmDelete() {
   }
 }
 
-watch(statusFilter, () => {
-  applicationStore.fetchApplications(
-    search.value,
-    statusFilter.value,
-    sort.value,
-  )
-})
-
-function handleSearch() {
-  applicationStore.fetchApplications(
-    search.value,
-    statusFilter.value,
-    sort.value,
-  )
-}
-
-watch(sort, () => {
-  applicationStore.fetchApplications(
-    search.value,
-    statusFilter.value,
-    sort.value,
-  )
-})
-
-function clearFilters() {
-  search.value = ''
-  statusFilter.value = ''
-}
-
-function goToPage(page: number) {
+function fetchFilteredApplications(page = 1) {
   applicationStore.fetchApplications(
     search.value,
     statusFilter.value,
     sort.value,
     page,
   )
+}
+
+watch([statusFilter, sort], () => {
+  fetchFilteredApplications()
+})
+
+function handleSearch() {
+  fetchFilteredApplications()
+}
+
+function clearFilters() {
+  const statusWasActive = statusFilter.value !== ''
+
+  search.value = ''
+  statusFilter.value = ''
+
+  // If status changed, the watcher will fetch.
+  // Otherwise nothing reactive changed that triggers a fetch,
+  // so fetch explicitly.
+  if (!statusWasActive) {
+    fetchFilteredApplications()
+  }
+}
+
+function goToPage(page: number) {
+  fetchFilteredApplications(page)
 }
 </script>
 

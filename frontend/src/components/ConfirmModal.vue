@@ -1,5 +1,7 @@
 <script setup lang="ts">
-defineProps<{
+import { onBeforeUnmount, watch } from 'vue'
+
+const props = defineProps<{
   open: boolean
   title: string
   message: string
@@ -8,10 +10,31 @@ defineProps<{
   loading?: boolean
 }>()
 
-defineEmits<{
+const emit = defineEmits<{
   confirm: []
   cancel: []
 }>()
+
+function handleKeydown(event: KeyboardEvent) {
+  if (event.key === 'Escape' && !props.loading) {
+    emit('cancel')
+  }
+}
+
+watch(
+  () => props.open,
+  (open) => {
+    if (open) {
+      window.addEventListener('keydown', handleKeydown)
+    } else {
+      window.removeEventListener('keydown', handleKeydown)
+    }
+  },
+)
+
+onBeforeUnmount(() => {
+  window.removeEventListener('keydown', handleKeydown)
+})
 </script>
 
 <template>
