@@ -35,13 +35,31 @@ class ApplicationController extends Controller
             $query->where('status', $request->input('status'));
         }
 
-        $applications = $query
-            ->latest()
-            ->get();
+        // Apply the requested sorting option
+        // If none was supplied, use newest
+        $sort = $request->input('sort', 'newest');
 
-        return response()->json([
-            'data' => $applications,
-        ]);
+        switch ($sort) {
+            case 'oldest':
+                $query->oldest();
+                break;
+
+            case 'recently_applied':
+                $query->orderByDesc('applied_at');
+                break;
+
+            case 'company_az':
+                $query->orderBy('company_name');
+                break;
+
+            default:
+                $query->latest();
+                break;
+        }
+
+        $applications = $query->paginate(5);
+
+        return response()->json($applications);
     }
 
     /**

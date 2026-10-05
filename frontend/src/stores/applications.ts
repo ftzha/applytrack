@@ -6,11 +6,21 @@ import api from '@/services/api'
 import type {
   Application,
   ApplicationFormData,
+  ApplicationPagination,
 } from '@/types/application'
 
 export const useApplicationStore = defineStore('applications', () => {
   // Applications belonging to the authenticated user
   const applications = ref<Application[]>([])
+
+  const pagination = ref<ApplicationPagination>({
+    current_page: 1,
+    last_page: 1,
+    per_page: 5,
+    total: 0,
+    from: null,
+    to: null,
+  })
 
   // Useful for showing loading indicators in the UI
   const loading = ref(false)
@@ -22,6 +32,8 @@ export const useApplicationStore = defineStore('applications', () => {
   async function fetchApplications(
     search = '',
     status = '',
+    sort = 'newest',
+    page = 1,
   ) {
     loading.value = true
     error.value = ''
@@ -31,11 +43,26 @@ export const useApplicationStore = defineStore('applications', () => {
         params: {
           search: search || undefined,
           status: status || undefined,
+          sort,
+          page,
         },
       })
 
+      // Application records for the current page
       applications.value = response.data.data
-    } catch {
+
+      // Pagination information returned by Laravel
+      pagination.value = {
+        current_page: response.data.current_page,
+        last_page: response.data.last_page,
+        per_page: response.data.per_page,
+        total: response.data.total,
+        from: response.data.from,
+        to: response.data.to,
+      }
+    } catch (err) {
+      console.error('Failed to fetch applications:', err)
+
       error.value = 'Unable to load applications.'
     } finally {
       loading.value = false
@@ -79,6 +106,7 @@ export const useApplicationStore = defineStore('applications', () => {
 
   return {
     applications,
+    pagination,
     loading,
     error,
     fetchApplications,

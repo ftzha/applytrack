@@ -14,6 +14,7 @@ const applicationStore = useApplicationStore()
 
 const search = ref('')
 const statusFilter = ref('')
+const sort = ref('newest')
 
 const deletingId = ref<number | null>(null)
 
@@ -56,6 +57,7 @@ watch(statusFilter, () => {
   applicationStore.fetchApplications(
     search.value,
     statusFilter.value,
+    sort.value,
   )
 })
 
@@ -63,6 +65,24 @@ function handleSearch() {
   applicationStore.fetchApplications(
     search.value,
     statusFilter.value,
+    sort.value,
+  )
+}
+
+watch(sort, () => {
+  applicationStore.fetchApplications(
+    search.value,
+    statusFilter.value,
+    sort.value,
+  )
+})
+
+function goToPage(page: number) {
+  applicationStore.fetchApplications(
+    search.value,
+    statusFilter.value,
+    sort.value,
+    page,
   )
 }
 
@@ -167,6 +187,16 @@ function formatDate(date: string | null) {
         {{ status.label }}
       </option>
     </select>
+
+    <select
+      v-model="sort"
+      class="filter-select"
+    >
+      <option value="newest">Newest</option>
+      <option value="oldest">Oldest</option>
+      <option value="recently_applied">Recently Applied</option>
+      <option value="company_az">Company A–Z</option>
+    </select>
   </div>
 
     <p v-if="applicationStore.loading">
@@ -184,54 +214,102 @@ function formatDate(date: string | null) {
       No applications yet.
     </div>
 
-    <div v-else class="application-list">
-      <div
-        v-for="application in applicationStore.applications"
-        :key="application.id"
-        class="card application-card"
+    <div v-else>
+      <p
+        v-if="applicationStore.pagination.total > 0"
+        class="results-info"
       >
-        <h2>{{ application.position }}</h2>
-        <p>{{ application.company_name }}</p>
+        Showing
+        {{ applicationStore.pagination.from }}
+        –
+        {{ applicationStore.pagination.to }}
+        of
+        {{ applicationStore.pagination.total }}
+        applications
+      </p>
 
-        <p v-if="application.location">
-          {{ application.location }}
-        </p>
+      <div class="application-list">
+        <div
+          v-for="application in applicationStore.applications"
+          :key="application.id"
+          class="card application-card"
+        >
+          <h2>{{ application.position }}</h2>
+          <p>{{ application.company_name }}</p>
 
-        <p>
-          Salary Offered:
-          {{ formatSalaryRange(
-            application.salary_min,
-            application.salary_max,
-            application.currency
-          ) }}
-        </p>
+          <p v-if="application.location">
+            {{ application.location }}
+          </p>
 
-        <p>
-          Date Applied: {{ formatDate(application.applied_at) }}
-        </p>
+          <p>
+            Salary Offered:
+            {{ formatSalaryRange(
+              application.salary_min,
+              application.salary_max,
+              application.currency
+            ) }}
+          </p>
 
-        <p>
-          Status:
-          <ApplicationStatusBadge :status="application.status" />
-        </p>
+          <p>
+            Date Applied: {{ formatDate(application.applied_at) }}
+          </p>
 
-        <div class="application-actions">
-          <RouterLink
-            :to="`/applications/${application.id}/edit`"
-            class="btn btn-secondary"
-          >
-            Edit
-          </RouterLink>
+          <p>
+            Status:
+            <ApplicationStatusBadge :status="application.status" />
+          </p>
 
-          <button
-            type="button"
-            class="btn btn-danger"
-            :disabled="deletingId === application.id"
-            @click="handleDelete(application.id)"
-          >
-            {{ deletingId === application.id ? 'Deleting...' : 'Delete' }}
-          </button>
+          <div class="application-actions">
+            <RouterLink
+              :to="`/applications/${application.id}/edit`"
+              class="btn btn-secondary"
+            >
+              Edit
+            </RouterLink>
+
+            <button
+              type="button"
+              class="btn btn-danger"
+              :disabled="deletingId === application.id"
+              @click="handleDelete(application.id)"
+            >
+              {{ deletingId === application.id ? 'Deleting...' : 'Delete' }}
+            </button>
+          </div>
         </div>
+      </div>
+
+      <div
+        v-if="applicationStore.pagination.last_page > 1"
+        class="pagination"
+      >
+        <button
+          type="button"
+          class="btn btn-secondary"
+          :disabled="applicationStore.pagination.current_page === 1"
+          @click="goToPage(applicationStore.pagination.current_page - 1)"
+        >
+          Previous
+        </button>
+
+        <span class="pagination-info">
+          Page
+          {{ applicationStore.pagination.current_page }}
+          of
+          {{ applicationStore.pagination.last_page }}
+        </span>
+
+        <button
+          type="button"
+          class="btn btn-secondary"
+          :disabled="
+            applicationStore.pagination.current_page ===
+            applicationStore.pagination.last_page
+          "
+          @click="goToPage(applicationStore.pagination.current_page + 1)"
+        >
+          Next
+        </button>
       </div>
     </div>
   </main>
@@ -317,5 +395,24 @@ function formatDate(date: string | null) {
   justify-content: flex-end;
   gap: 8px;
   margin-top: 8px;
+}
+
+.pagination {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  margin-top: 24px;
+}
+
+.pagination-info {
+  font-size: 14px;
+  color: #6b7280;
+}
+
+.results-info {
+  margin: 0 0 12px;
+  font-size: 14px;
+  color: #6b7280;
 }
 </style>

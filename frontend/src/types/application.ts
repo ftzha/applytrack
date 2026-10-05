@@ -37,3 +37,12 @@ export interface StatusOption {
   value: string
   label: string
 }
+
+export interface ApplicationPagination {
+  current_page: number
+  last_page: number
+  per_page: number
+  total: number
+  from: number | null
+  to: number | null
+}
