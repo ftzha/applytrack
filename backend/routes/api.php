@@ -6,6 +6,8 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\ApplicationController;
 use App\Http\Controllers\Api\AuthController;
 
+use App\Enums\ApplicationStatus;
+
 Route::get('/user', function (Request $request) {
     return $request->user();
 })->middleware('auth:sanctum');
@@ -27,4 +29,13 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/applications/{application}', [ApplicationController::class, 'show']); //View specific application
     Route::patch('/applications/{application}', [ApplicationController::class, 'update']); //Update specific application
     Route::delete('/applications/{application}', [ApplicationController::class, 'destroy']); //Delete specific application
+});
+
+Route::get('/application-statuses', function () {
+    return collect(ApplicationStatus::cases())
+        ->map(fn ($status) => [
+            'value' => $status->value,
+            'label' => $status->label(),
+        ])
+        ->values();
 });

@@ -2,26 +2,19 @@
 import { useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
 
-const router = useRouter()
+import AppNav from '@/components/AppNav.vue'
+
 const authStore = useAuthStore()
-
-async function handleLogout() {
-  await authStore.logout()
-
-  router.push('/login')
-}
 </script>
 
 <template>
+  <AppNav />
+
   <main>
     <h1>Dashboard</h1>
 
     <p v-if="authStore.user">
       Welcome, {{ authStore.user.name }}!
     </p>
-
-    <button @click="handleLogout">
-      Logout
-    </button>
   </main>
 </template>
