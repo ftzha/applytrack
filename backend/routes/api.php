@@ -5,6 +5,7 @@ use Illuminate\Support\Facades\Route;
 
 use App\Http\Controllers\Api\ApplicationController;
 use App\Http\Controllers\Api\AuthController;
+use App\Http\Controllers\Api\DashboardController;
 
 use App\Enums\ApplicationStatus;
 
@@ -23,6 +24,7 @@ Route::middleware('auth:sanctum')->group(function () {
     });
 
     Route::post('/logout', [AuthController::class, 'logout']);
+    Route::get('/dashboard', [DashboardController::class, 'index']);
 
     Route::get('/applications', [ApplicationController::class, 'index']); //List all existing applications
     Route::post('/applications', [ApplicationController::class, 'store']); //Create new application
