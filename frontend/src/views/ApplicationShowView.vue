@@ -1,11 +1,13 @@
 <script setup lang="ts">
 import { onMounted, ref } from 'vue'
-import { useRoute } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
 
 import { useApplicationStore } from '@/stores/applications'
+import { useToastStore } from '@/stores/toast'
 
 import AppNav from '@/components/AppNav.vue'
 import ApplicationStatusBadge from '@/components/ApplicationStatusBadge.vue'
+import ConfirmModal from '@/components/ConfirmModal.vue'
 
 import type { Application } from '@/types/application'
 
@@ -17,13 +19,19 @@ import {
 } from '@/utils/formatters'
 
 const route = useRoute()
+const router = useRouter()
+
 const applicationStore = useApplicationStore()
+const toastStore = useToastStore()
 
 const applicationId = route.params.id as string
 
 const application = ref<Application | null>(null)
 const loading = ref(true)
 const error = ref('')
+
+const showDeleteModal = ref(false)
+const deleting = ref(false)
 
 async function loadApplication() {
   loading.value = true
@@ -36,6 +44,31 @@ async function loadApplication() {
     error.value = 'Unable to load application.'
   } finally {
     loading.value = false
+  }
+}
+
+async function deleteApplication() {
+  if (!application.value) return
+
+  deleting.value = true
+
+  try {
+    await applicationStore.deleteApplication(application.value.id)
+
+    showDeleteModal.value = false
+
+    toastStore.openToast(
+      'Application deleted successfully.',
+    )
+
+    router.push('/applications')
+  } catch {
+    toastStore.openToast(
+      'Unable to delete application.',
+      'error',
+    )
+  } finally {
+    deleting.value = false
   }
 }
 
@@ -72,6 +105,14 @@ onMounted(() => {
       >
         Edit Application
       </RouterLink>
+
+      <button
+        type="button"
+        class="btn btn-danger"
+        @click="showDeleteModal = true"
+      >
+        Delete
+      </button>
     </div>
     <div
       v-if="loading"
@@ -221,6 +262,16 @@ onMounted(() => {
       </section>
     </div>
   </main>
+
+  <ConfirmModal
+    :open="showDeleteModal"
+    title="Delete Application"
+    message="Are you sure you want to delete this application? This action cannot be undone."
+    confirm-label="Delete"
+    :loading="deleting"
+    @confirm="deleteApplication"
+    @cancel="showDeleteModal = false"
+  />
 </template>
 
 <style scoped>
@@ -326,6 +377,15 @@ onMounted(() => {
   .history-item {
     flex-direction: column;
     align-items: flex-start;
+  }
+
+  .page-actions {
+    flex-direction: column;
+  }
+
+  .page-actions .btn {
+    width: 100%;
+    text-align: center;
   }
 }
 </style>

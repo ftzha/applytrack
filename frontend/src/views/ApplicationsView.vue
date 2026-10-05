@@ -1,9 +1,11 @@
 <script setup lang="ts">
-import { onMounted, ref, watch } from 'vue'
+import { computed, onMounted, ref, watch } from 'vue'
 import { useApplicationStore } from '@/stores/applications'
+import { useToastStore } from '@/stores/toast'
 
 import api from '@/services/api'
 import AppNav from '@/components/AppNav.vue'
+import ConfirmModal from '@/components/ConfirmModal.vue'
 import ApplicationStatusBadge from '@/components/ApplicationStatusBadge.vue'
 
 import type {
@@ -16,15 +18,21 @@ import {
 } from '@/utils/formatters'
 
 const applicationStore = useApplicationStore()
+const toastStore = useToastStore()
 
 const search = ref('')
 const statusFilter = ref('')
 const sort = ref('newest')
 
 const deletingId = ref<number | null>(null)
+const applicationToDelete = ref<number | null>(null)
 
 // Status options provided by Laravel's ApplicationStatus enum
 const statusOptions = ref<StatusOption[]>([])
+
+const hasActiveFilters = computed(() => {
+  return search.value.trim() !== '' || statusFilter.value !== ''
+})
 
 async function fetchStatuses() {
   const response = await api.get('/application-statuses')
@@ -38,21 +46,41 @@ onMounted(() => {
   fetchStatuses()
 })
 
-async function handleDelete(id: number) {
-  const confirmed = window.confirm(
-    'Are you sure you want to delete this application?',
-  )
+function requestDelete(id: number) {
+  applicationToDelete.value = id
+}
 
-  if (!confirmed) {
-    return
-  }
+function cancelDelete() {
+  if (deletingId.value !== null) return
 
-  deletingId.value = id
+  applicationToDelete.value = null
+}
+
+async function confirmDelete() {
+  if (applicationToDelete.value === null) return
+
+  deletingId.value = applicationToDelete.value
 
   try {
-    await applicationStore.deleteApplication(id)
+    await applicationStore.deleteApplication(
+      applicationToDelete.value,
+    )
+
+    applicationToDelete.value = null
+
+    await applicationStore.fetchApplications(
+      search.value,
+      statusFilter.value,
+      sort.value,
+      applicationStore.pagination.current_page,
+    )
+
+    toastStore.openToast('Application deleted successfully.')
   } catch {
-    window.alert('Unable to delete application.')
+    toastStore.openToast(
+      'Unable to delete application.',
+      'error',
+    )
   } finally {
     deletingId.value = null
   }
@@ -81,6 +109,11 @@ watch(sort, () => {
     sort.value,
   )
 })
+
+function clearFilters() {
+  search.value = ''
+  statusFilter.value = ''
+}
 
 function goToPage(page: number) {
   applicationStore.fetchApplications(
@@ -159,7 +192,22 @@ function goToPage(page: number) {
     </select>
   </div>
 
-    <p v-if="applicationStore.loading">
+  <span
+    v-if="
+      applicationStore.loading &&
+      applicationStore.applications.length > 0
+    "
+    class="filter-loading"
+  >
+    Updating...
+  </span>
+
+    <p
+      v-if="
+        applicationStore.loading &&
+        applicationStore.applications.length === 0
+      "
+    >
       Loading applications...
     </p>
 
@@ -169,9 +217,38 @@ function goToPage(page: number) {
 
     <div
       v-else-if="applicationStore.applications.length === 0"
-      class="card"
+      class="card empty-state"
     >
-      No applications yet.
+      <template v-if="hasActiveFilters">
+        <h2>No matching applications</h2>
+
+        <p>
+          Try changing your search or status filter.
+        </p>
+
+        <button
+          type="button"
+          class="btn btn-secondary"
+          @click="clearFilters"
+        >
+          Clear filters
+        </button>
+      </template>
+
+      <template v-else>
+        <h2>No applications yet</h2>
+
+        <p>
+          Add your first job application to start tracking your progress.
+        </p>
+
+        <RouterLink
+          to="/applications/create"
+          class="btn btn-primary"
+        >
+          Add Application
+        </RouterLink>
+      </template>
     </div>
 
     <div v-else>
@@ -237,10 +314,9 @@ function goToPage(page: number) {
             <button
               type="button"
               class="btn btn-danger"
-              :disabled="deletingId === application.id"
-              @click="handleDelete(application.id)"
+              @click="requestDelete(application.id)"
             >
-              {{ deletingId === application.id ? 'Deleting...' : 'Delete' }}
+              Delete
             </button>
           </div>
         </div>
@@ -280,6 +356,16 @@ function goToPage(page: number) {
       </div>
     </div>
   </main>
+
+  <ConfirmModal
+    :open="applicationToDelete !== null"
+    title="Delete Application"
+    message="Are you sure you want to delete this application? This action cannot be undone."
+    confirm-label="Delete"
+    :loading="deletingId !== null"
+    @confirm="confirmDelete"
+    @cancel="cancelDelete"
+  />
 </template>
 
 <style scoped>
@@ -313,15 +399,24 @@ function goToPage(page: number) {
   min-width: 180px;
 }
 
-@media (max-width: 640px) {
-  .application-filters {
-    align-items: stretch;
-    flex-direction: column;
-  }
+.filter-loading {
+  display: block;
+  margin-top: 8px;
+  font-size: 13px;
+  color: #6b7280;
+}
 
-  .filter-select {
-    width: 100%;
-  }
+.empty-state {
+  text-align: center;
+}
+
+.empty-state h2 {
+  margin-top: 0;
+}
+
+.empty-state p {
+  margin-bottom: 16px;
+  color: #6b7280;
 }
 
 .application-list {
@@ -350,13 +445,6 @@ function goToPage(page: number) {
   gap: 24px;
 }
 
-@media (max-width: 640px) {
-  .applications-header {
-    align-items: stretch;
-    flex-direction: column;
-  }
-}
-
 .application-actions {
   display: flex;
   justify-content: flex-end;
@@ -381,5 +469,31 @@ function goToPage(page: number) {
   margin: 0 0 12px;
   font-size: 14px;
   color: #6b7280;
+}
+
+@media (max-width: 640px) {
+  .application-filters {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .filter-select {
+    width: 100%;
+  }
+
+  .applications-header {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .application-actions {
+    justify-content: flex-start;
+    gap: 6px;
+  }
+
+  .application-actions .btn {
+    padding: 7px 10px;
+    font-size: 13px;
+  }
 }
 </style>

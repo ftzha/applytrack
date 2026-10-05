@@ -72,19 +72,40 @@ async function handleLogout() {
   font-weight: 500;
 }
 
-.nav-links a:hover,
+.nav-links a:hover {
+  color: #2563eb;
+}
+
 .nav-links a.router-link-active {
   color: #2563eb;
+  font-weight: 600;
 }
 
 @media (max-width: 640px) {
   .nav-container {
     width: calc(100% - 24px);
-    gap: 16px;
+    padding: 12px 0;
+
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 12px 16px;
+  }
+
+  .brand {
+    align-self: center;
   }
 
   .nav-links {
-    gap: 12px;
+    grid-column: 1 / -1;
+    grid-row: 2;
+
+    display: flex;
+    gap: 20px;
+  }
+
+  .nav-container > .btn {
+    grid-column: 2;
+    grid-row: 1;
   }
 }
 </style>

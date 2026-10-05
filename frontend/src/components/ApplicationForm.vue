@@ -264,7 +264,7 @@ function handleSubmit() {
           {{ props.validationErrors.applied_at[0] }}
         </p>
       </div>
-      
+
       <div class="form-group">
         <label for="next_action">Next Action</label>
 
@@ -330,9 +330,9 @@ function handleSubmit() {
       <button
         type="submit"
         class="btn btn-primary"
-        :disabled="props.submitting"
+        :disabled="submitting"
       >
-        {{ props.submitting ? 'Saving...' : props.submitLabel }}
+        {{ submitting ? 'Saving...' : submitLabel }}
       </button>
     </div>
   </form>

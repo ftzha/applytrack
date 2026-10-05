@@ -2,6 +2,7 @@
 import { onMounted, reactive, ref } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { useApplicationStore } from '@/stores/applications'
+import { useToastStore } from '@/stores/toast'
 
 import axios from 'axios'
 import api from '@/services/api'
@@ -24,6 +25,7 @@ const route = useRoute()
 const router = useRouter()
 
 const applicationStore = useApplicationStore()
+const toastStore = useToastStore()
 
 const submitting = ref(false)
 const validationErrors = ref<Record<string, string[]>>({})
@@ -85,7 +87,7 @@ async function loadApplication() {
     form.status = application.status
     form.applied_at = application.applied_at ?? ''
     form.next_action = application.next_action ?? ''
-    
+
     form.follow_up_at = formatDateTimeLocal(
       application.follow_up_at,
     )
@@ -122,6 +124,8 @@ async function handleSubmit() {
       notes: form.notes,
     })
 
+    toastStore.openToast('Application updated successfully.')
+
     router.push('/applications')
   } catch (err) {
     if (axios.isAxiosError(err) && err.response?.status === 422) {
@@ -129,7 +133,10 @@ async function handleSubmit() {
       return
     }
 
-    error.value = 'Unable to update application.'
+    toastStore.openToast(
+      'Unable to update application.',
+      'error',
+    )
   } finally {
     submitting.value = false
   }

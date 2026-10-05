@@ -2,6 +2,7 @@
 import { onMounted, reactive, ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { useApplicationStore } from '@/stores/applications'
+import { useToastStore } from '@/stores/toast'
 
 import axios from 'axios'
 import api from '@/services/api'
@@ -15,6 +16,7 @@ import type {
 
 const router = useRouter()
 const applicationStore = useApplicationStore()
+const toastStore = useToastStore()
 
 const submitting = ref(false)
 const error = ref('')
@@ -77,6 +79,8 @@ async function handleSubmit() {
       notes: form.notes,
     })
 
+    toastStore.openToast('Application created successfully.')
+
     router.push('/applications')
   } catch (err) {
     // Laravel validation failure
@@ -87,6 +91,11 @@ async function handleSubmit() {
 
     // Unexpected/non-validation failure
     error.value = 'Unable to create application.'
+
+    toastStore.openToast(
+      'Unable to create application.',
+      'error',
+    )
   } finally {
     submitting.value = false
   }
