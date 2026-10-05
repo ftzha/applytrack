@@ -264,6 +264,41 @@ function handleSubmit() {
           {{ props.validationErrors.applied_at[0] }}
         </p>
       </div>
+      
+      <div class="form-group">
+        <label for="next_action">Next Action</label>
+
+        <input
+          id="next_action"
+          v-model="form.next_action"
+          type="text"
+          placeholder="e.g. Follow up with recruiter"
+        />
+
+        <p
+          v-if="validationErrors.next_action"
+          class="field-error"
+        >
+          {{ validationErrors.next_action[0] }}
+        </p>
+      </div>
+
+      <div class="form-group">
+        <label for="follow_up_at">Follow-up Date & Time</label>
+
+        <input
+          id="follow_up_at"
+          v-model="form.follow_up_at"
+          type="datetime-local"
+        />
+
+        <p
+          v-if="validationErrors.follow_up_at"
+          class="field-error"
+        >
+          {{ validationErrors.follow_up_at[0] }}
+        </p>
+      </div>
     </div>
 
     <div class="form-group">

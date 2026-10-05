@@ -12,6 +12,7 @@ import type { Application } from '@/types/application'
 import {
   formatDate,
   formatDateTime,
+  formatLocalDateTime,
   formatSalaryRange,
 } from '@/utils/formatters'
 
@@ -160,6 +161,20 @@ onMounted(() => {
           </div>
         </div>
 
+        <div class="details-follow-up">
+          <span class="detail-label">Next Action</span>
+
+          <p>
+            {{ application.next_action || 'No next action set.' }}
+          </p>
+
+          <span class="detail-label">Follow-up Date & Time</span>
+
+          <p>
+            {{ formatLocalDateTime(application.follow_up_at) }}
+          </p>
+        </div>
+
         <div class="details-notes">
           <span class="detail-label">Notes</span>
 
@@ -254,6 +269,20 @@ onMounted(() => {
 .detail-label {
   font-size: 13px;
   color: #6b7280;
+}
+
+.details-follow-up {
+  margin-top: 24px;
+  padding-top: 20px;
+  border-top: 1px solid #e5e7eb;
+}
+
+.details-follow-up p {
+  margin: 4px 0 16px;
+}
+
+.details-follow-up p:last-child {
+  margin-bottom: 0;
 }
 
 .notes {

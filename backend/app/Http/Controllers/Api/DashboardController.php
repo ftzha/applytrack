@@ -43,6 +43,21 @@ class DashboardController extends Controller
             ->limit(5)
             ->get();
 
+        $upcomingActions = $request->user()
+            ->applications()
+            ->whereNotNull('next_action')
+            ->whereNotNull('follow_up_at')
+            ->orderBy('follow_up_at')
+            ->limit(5)
+            ->get([
+                'id',
+                'company_name',
+                'position',
+                'status',
+                'next_action',
+                'follow_up_at',
+            ]);
+
         return response()->json([
             'data' => [
                 'total' => $statusCounts->sum(),
@@ -56,6 +71,7 @@ class DashboardController extends Controller
 
                 'recent_applications' => $recentApplications,
                 'recent_activity' => $recentActivity,
+                'upcoming_actions' => $upcomingActions,
             ],
         ]);
     }

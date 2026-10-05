@@ -18,6 +18,7 @@ export const useDashboardStore = defineStore('dashboard', () => {
     withdrawn: 0,
     recent_applications: [],
     recent_activity: [],
+    upcoming_actions: [],
   })
 
   const loading = ref(false)

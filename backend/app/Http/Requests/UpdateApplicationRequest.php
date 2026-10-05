@@ -78,6 +78,17 @@ class UpdateApplicationRequest extends FormRequest
             ],
 
             'applied_at' => ['sometimes', 'nullable', 'date'],
+            'next_action' => [
+                'nullable',
+                'string',
+                'max:255',
+            ],
+
+            'follow_up_at' => [
+                'nullable',
+                'date',
+            ],
+            
             'notes' => ['sometimes', 'nullable', 'string'],
         ];
     }

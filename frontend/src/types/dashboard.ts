@@ -21,6 +21,15 @@ interface RecentActivity {
   }
 }
 
+export interface UpcomingAction {
+  id: number
+  company_name: string
+  position: string
+  status: string
+  next_action: string
+  follow_up_at: string
+}
+
 export interface DashboardStats {
   total: number
   interested: number
@@ -32,4 +41,5 @@ export interface DashboardStats {
   withdrawn: number
   recent_applications: RecentApplication[]
   recent_activity: RecentActivity[]
+  upcoming_actions: UpcomingAction[]
 }

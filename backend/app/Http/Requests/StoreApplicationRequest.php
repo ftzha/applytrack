@@ -46,6 +46,17 @@ class StoreApplicationRequest extends FormRequest
 
             'applied_at' => ['nullable', 'date'],
 
+            'next_action' => [
+                'nullable',
+                'string',
+                'max:255',
+            ],
+
+            'follow_up_at' => [
+                'nullable',
+                'date',
+            ],
+            
             'notes' => ['nullable', 'string'],
         ];
     }

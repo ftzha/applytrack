@@ -12,6 +12,8 @@ export interface Application {
   job_url: string | null
   status: string
   applied_at: string | null
+  next_action: string | null
+  follow_up_at: string | null
   notes: string | null
   created_at: string
   updated_at: string
@@ -32,6 +34,8 @@ export interface ApplicationFormData {
   job_url: string
   status: string
   applied_at: string
+  next_action: string | null
+  follow_up_at: string | null
   notes: string
 }
 

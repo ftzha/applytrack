@@ -15,7 +15,10 @@ import type {
   StatusOption,
 } from '@/types/application'
 
-import { formatDateTime } from '@/utils/formatters'
+import {
+  formatDateTime,
+  formatDateTimeLocal,
+} from '@/utils/formatters'
 
 const route = useRoute()
 const router = useRouter()
@@ -54,6 +57,8 @@ const form = reactive<ApplicationFormData>({
   job_url: '',
   status: '',
   applied_at: '',
+  next_action: '',
+  follow_up_at: '',
   notes: '',
 })
 
@@ -79,6 +84,12 @@ async function loadApplication() {
     form.job_url = application.job_url ?? ''
     form.status = application.status
     form.applied_at = application.applied_at ?? ''
+    form.next_action = application.next_action ?? ''
+    
+    form.follow_up_at = formatDateTimeLocal(
+      application.follow_up_at,
+    )
+
     form.notes = application.notes ?? ''
   } catch {
     error.value = 'Unable to load application.'
@@ -106,6 +117,8 @@ async function handleSubmit() {
       job_url: form.job_url,
       status: form.status,
       applied_at: form.applied_at,
+      next_action: form.next_action,
+      follow_up_at: form.follow_up_at,
       notes: form.notes,
     })
 

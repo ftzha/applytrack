@@ -48,6 +48,8 @@ const form = reactive<ApplicationFormData>({
   job_url: '',
   status: 'interested',
   applied_at: '',
+  next_action: '',
+  follow_up_at: '',
   notes: '',
 })
 
@@ -70,6 +72,8 @@ async function handleSubmit() {
       job_url: form.job_url,
       status: form.status,
       applied_at: form.applied_at,
+      next_action: form.next_action,
+      follow_up_at: form.follow_up_at,
       notes: form.notes,
     })
 

@@ -8,6 +8,8 @@ import ApplicationStatusBadge from '@/components/ApplicationStatusBadge.vue'
 import {
   formatDate,
   formatDateTime,
+  formatLocalDateTime,
+  parseLocalDateTime,
 } from '@/utils/formatters'
 
 const dashboardStore = useDashboardStore()
@@ -16,6 +18,14 @@ const dashboardStore = useDashboardStore()
 onMounted(() => {
   dashboardStore.fetchDashboard()
 })
+
+function isOverdue(date: string) {
+  const followUp = parseLocalDateTime(date)
+
+  if (!followUp) return false
+
+  return followUp < new Date()
+}
 </script>
 
 <template>
@@ -102,6 +112,57 @@ onMounted(() => {
           </strong>
         </div>
       </div>
+
+      <section class="recent-section">
+        <div class="section-header">
+          <h2>Next Actions</h2>
+        </div>
+
+        <div
+          v-if="dashboardStore.stats.upcoming_actions.length === 0"
+          class="card"
+        >
+          No next actions scheduled.
+        </div>
+
+        <div
+          v-else
+          class="recent-list"
+        >
+          <RouterLink
+            v-for="action in dashboardStore.stats.upcoming_actions"
+            :key="action.id"
+            :to="`/applications/${action.id}`"
+            class="card upcoming-action"
+            :class="{ overdue: isOverdue(action.follow_up_at) }"
+          >
+            <div class="action-info">
+              <div class="action-heading">
+                <strong>
+                  {{ action.next_action }}
+                </strong>
+
+                <span
+                  v-if="isOverdue(action.follow_up_at)"
+                  class="overdue-label"
+                >
+                  Overdue
+                </span>
+              </div>
+
+              <p>
+                {{ action.position }} · {{ action.company_name }}
+              </p>
+
+              <span class="action-date">
+                {{ formatLocalDateTime(action.follow_up_at) }}
+              </span>
+            </div>
+
+            <ApplicationStatusBadge :status="action.status" />
+          </RouterLink>
+        </div>
+      </section>
 
       <section class="recent-section">
         <div class="section-header">
@@ -335,6 +396,54 @@ onMounted(() => {
 @media (max-width: 640px) {
   .recent-application,
   .activity-item {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}
+
+.upcoming-action {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  text-decoration: none;
+  color: inherit;
+}
+
+.action-info {
+  min-width: 0;
+}
+
+.action-heading {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.action-info p {
+  margin: 4px 0 0;
+  color: #6b7280;
+}
+
+.action-date {
+  display: block;
+  margin-top: 6px;
+  font-size: 13px;
+  color: #6b7280;
+}
+
+.overdue-label {
+  padding: 2px 7px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 600;
+  background: #fee2e2;
+  color: #b91c1c;
+}
+
+@media (max-width: 640px) {
+  .upcoming-action {
     flex-direction: column;
     align-items: flex-start;
   }
