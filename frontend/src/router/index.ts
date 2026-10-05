@@ -5,6 +5,7 @@ import LoginView from '@/views/LoginView.vue'
 import DashboardView from '@/views/DashboardView.vue'
 import ApplicationsView from '@/views/ApplicationsView.vue'
 import ApplicationCreateView from '@/views/ApplicationCreateView.vue'
+import ApplicationShowView from '@/views/ApplicationShowView.vue'
 import ApplicationEditView from '@/views/ApplicationEditView.vue'
 
 const router = createRouter({
@@ -43,6 +44,11 @@ const router = createRouter({
       meta: {
         requiresAuth: true,
       },
+    },
+    {
+      path: '/applications/:id',
+      name: 'application-show',
+      component: () => import('@/views/ApplicationShowView.vue'),
     },
     {
       path: '/applications/:id/edit',

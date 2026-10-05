@@ -261,6 +261,13 @@ function formatDate(date: string | null) {
 
           <div class="application-actions">
             <RouterLink
+              :to="`/applications/${application.id}`"
+              class="btn btn-primary"
+            >
+              View
+            </RouterLink>
+
+            <RouterLink
               :to="`/applications/${application.id}/edit`"
               class="btn btn-secondary"
             >
