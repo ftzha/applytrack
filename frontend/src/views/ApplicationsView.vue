@@ -15,6 +15,7 @@ import type {
 import {
   formatDate,
   formatSalaryRange,
+  formatDisplayValue,
 } from '@/utils/formatters'
 
 const applicationStore = useApplicationStore()
@@ -272,7 +273,7 @@ function goToPage(page: number) {
           <p>{{ application.company_name }}</p>
 
           <p v-if="application.location">
-            {{ application.location }}
+            {{ formatDisplayValue(application.location) }}
           </p>
 
           <p>

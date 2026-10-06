@@ -16,6 +16,7 @@ import {
   formatDateTime,
   formatLocalDateTime,
   formatSalaryRange,
+  formatDisplayValue,
 } from '@/utils/formatters'
 
 const route = useRoute()
@@ -150,17 +151,17 @@ onMounted(() => {
         <div class="details-grid">
           <div class="detail-item">
             <span class="detail-label">Location</span>
-            <span>{{ application.location || 'Not specified' }}</span>
+            <span>{{ formatDisplayValue(application.location) || 'Not specified' }}</span>
           </div>
 
           <div class="detail-item">
             <span class="detail-label">Employment Type</span>
-            <span>{{ application.employment_type || 'Not specified' }}</span>
+            <span>{{ formatDisplayValue(application.employment_type) || 'Not specified' }}</span>
           </div>
 
           <div class="detail-item">
             <span class="detail-label">Work Mode</span>
-            <span>{{ application.work_mode || 'Not specified' }}</span>
+            <span>{{ formatDisplayValue(application.work_mode) || 'Not specified' }}</span>
           </div>
 
           <div class="detail-item">
@@ -178,7 +179,7 @@ onMounted(() => {
 
           <div class="detail-item">
             <span class="detail-label">Source</span>
-            <span>{{ application.source || 'Not specified' }}</span>
+            <span>{{ formatDisplayValue(application.source)|| 'Not specified' }}</span>
           </div>
 
           <div class="detail-item">

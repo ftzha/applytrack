@@ -4,8 +4,11 @@ import type {
   StatusOption,
 } from '@/types/application'
 
+const form = defineModel<ApplicationFormData>({
+  required: true,
+})
+
 const props = defineProps<{
-  form: ApplicationFormData
   statusOptions: StatusOption[]
   validationErrors: Record<string, string[]>
   submitting: boolean
@@ -31,7 +34,7 @@ function handleSubmit() {
 
       <input
         id="company_name"
-        v-model="props.form.company_name"
+        v-model="form.company_name"
         type="text"
         placeholder="e.g. Acme Technologies"
       />
@@ -49,7 +52,7 @@ function handleSubmit() {
 
       <input
         id="position"
-        v-model="props.form.position"
+        v-model="form.position"
         type="text"
         placeholder="e.g. Software Engineer"
       />
@@ -67,7 +70,7 @@ function handleSubmit() {
 
       <input
         id="location"
-        v-model="props.form.location"
+        v-model="form.location"
         type="text"
         placeholder="e.g. Kuala Lumpur"
       />
@@ -86,7 +89,7 @@ function handleSubmit() {
 
         <select
           id="employment_type"
-          v-model="props.form.employment_type"
+          v-model="form.employment_type"
         >
           <option value="">Not specified</option>
           <option value="full-time">Full-time</option>
@@ -108,7 +111,7 @@ function handleSubmit() {
 
         <select
           id="work_mode"
-          v-model="props.form.work_mode"
+          v-model="form.work_mode"
         >
           <option value="">Not specified</option>
           <option value="on-site">On-site</option>
@@ -131,7 +134,7 @@ function handleSubmit() {
 
         <input
           id="salary_min"
-          v-model="props.form.salary_min"
+          v-model="form.salary_min"
           type="number"
           min="0"
           placeholder="e.g. 5000"
@@ -150,7 +153,7 @@ function handleSubmit() {
 
         <input
           id="salary_max"
-          v-model="props.form.salary_max"
+          v-model="form.salary_max"
           type="number"
           min="0"
           placeholder="e.g. 7000"
@@ -170,7 +173,7 @@ function handleSubmit() {
 
       <select
         id="currency"
-        v-model="props.form.currency"
+        v-model="form.currency"
       >
         <option value="MYR">MYR — Malaysian Ringgit</option>
         <option value="SGD">SGD — Singapore Dollar</option>
@@ -191,7 +194,7 @@ function handleSubmit() {
 
         <input
           id="source"
-          v-model="props.form.source"
+          v-model="form.source"
           type="text"
           placeholder="e.g. JobStreet"
         />
@@ -209,7 +212,7 @@ function handleSubmit() {
 
         <input
           id="job_url"
-          v-model="props.form.job_url"
+          v-model="form.job_url"
           type="url"
           placeholder="https://..."
         />
@@ -229,7 +232,7 @@ function handleSubmit() {
 
         <select
           id="status"
-          v-model="props.form.status"
+          v-model="form.status"
         >
           <option
             v-for="status in props.statusOptions"
@@ -253,7 +256,7 @@ function handleSubmit() {
 
         <input
           id="applied_at"
-          v-model="props.form.applied_at"
+          v-model="form.applied_at"
           type="date"
         />
 
@@ -306,7 +309,7 @@ function handleSubmit() {
 
       <textarea
         id="notes"
-        v-model="props.form.notes"
+        v-model="form.notes"
         rows="5"
         placeholder="Anything useful about this application..."
       ></textarea>

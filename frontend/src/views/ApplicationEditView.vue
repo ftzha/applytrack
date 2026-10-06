@@ -146,10 +146,6 @@ onMounted(() => {
   loadApplication()
   fetchStatuses()
 })
-
-function formatStatus(status: string) {
-  return status.charAt(0).toUpperCase() + status.slice(1)
-}
 </script>
 
 <template>
@@ -174,7 +170,7 @@ function formatStatus(status: string) {
 
     <ApplicationForm
       v-else
-      :form="form"
+      v-model="form"
       :status-options="statusOptions"
       :validation-errors="validationErrors"
       :submitting="submitting"

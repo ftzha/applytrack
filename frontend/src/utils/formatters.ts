@@ -118,3 +118,13 @@ export function parseLocalDateTime(date: string) {
     minute,
   )
 }
+
+export function formatDisplayValue(
+  value: string | null | undefined,
+) {
+  if (!value) return '-'
+
+  return value
+    .replace(/_/g, ' ')
+    .replace(/\b\w/g, (char) => char.toUpperCase())
+}

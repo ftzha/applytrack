@@ -9,15 +9,11 @@ use App\Http\Controllers\Api\DashboardController;
 
 use App\Enums\ApplicationStatus;
 
-Route::get('/user', function (Request $request) {
-    return $request->user();
-})->middleware('auth:sanctum');
-
-//Public routes
+// Public routes
 Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login']);
 
-//Protected routes; Need login
+// Protected routes
 Route::middleware('auth:sanctum')->group(function () {
     Route::get('/user', function (Request $request) {
         return $request->user();

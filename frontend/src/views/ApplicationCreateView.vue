@@ -119,7 +119,7 @@ async function handleSubmit() {
     </p>
 
     <ApplicationForm
-      :form="form"
+      v-model="form"
       :status-options="statusOptions"
       :validation-errors="validationErrors"
       :submitting="submitting"
