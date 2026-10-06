@@ -37,7 +37,6 @@ class Application extends Model
             'applied_at' => 'date',
             'salary_min' => 'decimal:2',
             'salary_max' => 'decimal:2',
-            'applied_at' => 'date',
             'follow_up_at' => 'datetime',
         ];
     }
